@@ -1,0 +1,19 @@
+--source ../include/my-quiver/have-my-quiver.inc
+
+--disable_warnings
+DROP TABLE IF EXISTS ids;
+--enable_warnings
+
+CREATE TABLE ids (
+  id int PRIMARY KEY
+);
+
+INSERT INTO ids VALUES (1);
+INSERT INTO ids VALUES (2);
+INSERT INTO ids VALUES (3);
+
+SELECT COUNT(*) FROM ids;
+
+DROP TABLE ids;
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

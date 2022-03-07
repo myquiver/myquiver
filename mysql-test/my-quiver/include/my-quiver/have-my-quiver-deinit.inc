@@ -1,0 +1,6 @@
+disable_query_log;
+
+eval set default_storage_engine=$original_default_storage_engine;
+eval set default_tmp_storage_engine=$original_default_tmp_storage_engine;
+
+enable_query_log;
