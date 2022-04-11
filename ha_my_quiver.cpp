@@ -25,10 +25,10 @@ static int my_quiver_init_func(void *p) {
   return 0;
 }
 
-mysql_declare_plugin(example){
+mysql_declare_plugin(my_quiver){
     MYSQL_STORAGE_ENGINE_PLUGIN,
     &my_quiver_storage_engine,
-    "MYQUIVER",
+    "MyQuiver",
     "Shoichi Kagawa",
     "MySQL storage engine powered by Apache Arrow",
     PLUGIN_LICENSE_BSD,

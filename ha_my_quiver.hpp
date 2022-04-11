@@ -1,3 +1,5 @@
+#define MYSQL_DYNAMIC_PLUGIN
+
 #include <sql/handler.h>
 #include <mysql/plugin.h>
 

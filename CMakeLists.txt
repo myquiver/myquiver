@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.4)
+cmake_minimum_required(VERSION 3.16.3)
 
 project(MyQuiver VERSION 1.0.0)
 
