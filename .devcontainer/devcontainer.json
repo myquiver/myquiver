@@ -1,0 +1,11 @@
+{
+	"name": "MyQuiverDev",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	// Add capability to allow mount swapfile and increase shm to do mysql-test
+	"runArgs": ["--cap-add=SYS_PTRACE", "--cap-add=SYS_ADMIN", "--security-opt", "seccomp=unconfined", "--shm-size=1g"],
+	"postCreateCommand": ".devcontainer/post-create.sh",
+	"postStartCommand": ".devcontainer/post-start.sh",
+	"remoteUser": "codespace"
+}
