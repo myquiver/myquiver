@@ -1,7 +1,7 @@
 #include "ha_my_quiver.hpp"
 
 ha_my_quiver::ha_my_quiver(handlerton *hton, TABLE_SHARE *table_arg)
-    : handler(hton, table_arg) {}
+    : handler(hton, table_arg), reader_(nullptr) {}
 
 
 static struct st_mysql_storage_engine my_quiver_storage_engine = {

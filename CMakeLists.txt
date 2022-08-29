@@ -19,7 +19,10 @@ target_include_directories(mysqld INTERFACE ${MY_QUIVER_MYSQL_SOURCE_DIR} ${MY_Q
 find_package(OpenSSL REQUIRED)
 target_link_libraries(mysqld INTERFACE OpenSSL::SSL)
 
-target_link_libraries(ha_my_quiver PRIVATE mysqld)
+find_package(Arrow REQUIRED)
+find_package(Parquet REQUIRED)
+
+target_link_libraries(ha_my_quiver PRIVATE mysqld parquet_shared)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/config.sh.in"

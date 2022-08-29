@@ -1,19 +1,16 @@
 --source ../include/my-quiver/have-my-quiver.inc
-
+--source ../include/my-quiver/have-my-quiver-helper.inc
 --disable_warnings
-DROP TABLE IF EXISTS ids;
+DROP TABLE IF EXISTS example;
 --enable_warnings
+--copy_file  suite/my-quiver/example.parquet $MYSQLD_DATADIR/test/example.parquet
 
-CREATE TABLE ids (
-  id int PRIMARY KEY
+CREATE TABLE example (
+  id int
 );
 
-INSERT INTO ids VALUES (1);
-INSERT INTO ids VALUES (2);
-INSERT INTO ids VALUES (3);
+SELECT COUNT(*) FROM example;
 
-SELECT COUNT(*) FROM ids;
-
-DROP TABLE ids;
+DROP TABLE example;
 
 --source ../include/my-quiver/have-my-quiver-deinit.inc
