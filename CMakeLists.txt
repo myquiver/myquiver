@@ -15,7 +15,7 @@ set_property(TARGET mysqld PROPERTY IMPORTED_LOCATION ${MY_QUIVER_MYSQLD_ABSOLUT
 set_property(TARGET mysqld PROPERTY ENABLE_EXPORTS TRUE)
 set(MY_QUIVER_MYSQL_SOURCE_DIR "" CACHE PATH "MySQL source directory to build with")
 set(MY_QUIVER_MYSQL_BUILD_DIR "" CACHE PATH "MySQL build directory to build with")
-target_include_directories(mysqld INTERFACE ${MY_QUIVER_MYSQL_SOURCE_DIR} ${MY_QUIVER_MYSQL_SOURCE_DIR}/include ${MY_QUIVER_MYSQL_BUILD_DIR}/include)
+target_include_directories(mysqld INTERFACE ${MY_QUIVER_MYSQL_SOURCE_DIR} ${MY_QUIVER_MYSQL_SOURCE_DIR}/include ${MY_QUIVER_MYSQL_SOURCE_DIR}/extra/rapidjson/include ${MY_QUIVER_MYSQL_BUILD_DIR}/include)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(mysqld INTERFACE OpenSSL::SSL)
 

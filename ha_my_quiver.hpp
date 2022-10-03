@@ -1,10 +1,34 @@
 #define MYSQL_DYNAMIC_PLUGIN
 
 #include <sql/handler.h>
+#include <sql/table.h>
+#include <sql/field.h>
 #include <mysql/plugin.h>
 #include <parquet/arrow/reader.h>
 #include <arrow/io/api.h>
 #include <arrow/record_batch.h>
+#include <arrow/array.h>
+
+namespace mqv {
+  class DebugColumnAccess {
+    TABLE *table_;
+    MY_BITMAP *bitmap_;
+#ifndef DBUG_OFF
+    my_bitmap_map *map_;
+#endif
+  public:
+    DebugColumnAccess(TABLE *table, MY_BITMAP *bitmap): table_(table), bitmap_(bitmap) {
+#ifndef DBUG_OFF
+      map_ = dbug_tmp_use_all_columns(table_, bitmap_);
+#endif
+    };
+    ~DebugColumnAccess() {
+#ifndef DBUG_OFF
+      dbug_tmp_restore_column_map(bitmap_, map_);
+#endif
+    };
+  };
+};
 
 class ha_my_quiver : public handler {
   public:
@@ -35,6 +59,14 @@ class ha_my_quiver : public handler {
   }
   int rnd_next(uchar *buf) override {
     DBUG_TRACE;
+    auto column = std::static_pointer_cast<arrow::Int64Array>(record_batch_->columns()[0]);
+    auto value = column->Value(nth_row_);
+    auto field = static_cast<Field_longlong*>(table->field[0]);
+    {
+      mqv::DebugColumnAccess debug_column_access(table, table->write_set);
+      field->set_notnull();
+      field->store(value, false);
+    }
     if (nth_row_ >= record_batch_->num_rows()) {
       //TODO: record_batch_readerをNextする
       return HA_ERR_END_OF_FILE;
