@@ -12,5 +12,6 @@ CREATE TABLE example (
 SELECT COUNT(*) FROM example;
 
 DROP TABLE example;
+--remove_file $MYSQLD_DATADIR/test/example.parquet
 
 --source ../include/my-quiver/have-my-quiver-deinit.inc
