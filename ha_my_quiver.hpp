@@ -65,8 +65,9 @@ class ha_my_quiver : public handler {
       auto source_node_options = arrow::compute::SourceNodeOptions{schema, batch_gen};
       ARROW_ASSIGN_OR_RAISE(auto source,
                         arrow::compute::MakeExecNode("source", exec_plan_.get(), {}, source_node_options));
-      
-      arrow::AsyncGenerator<std::optional<arrow::compute::ExecBatch>> sink_gen;
+
+      // TODO: Change to std:optional after updating arrow
+      arrow::AsyncGenerator<arrow::util::optional<arrow::compute::ExecBatch>> sink_gen;
       ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {source}, arrow::compute::SinkNodeOptions{&sink_gen}));
 
       record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_->memory_pool());
