@@ -52,13 +52,13 @@ class ha_my_quiver : public handler {
     std::vector<int> row_group_indices(num_row_groups);
     std::iota(row_group_indices.begin(), row_group_indices.end(), 0);
     std::unique_ptr<arrow::RecordBatchReader> source_record_batch_reader;
-    auto status = reader_->GetRecordBatchReader(row_group_indices, &source_record_batch_reader);
-    if (!status.ok()) {
+    auto reader_status = reader_->GetRecordBatchReader(row_group_indices, &source_record_batch_reader);
+    if (!reader_status.ok()) {
       return 1; // TODO: return error code
     }
 
     exec_context_ = std::make_unique<arrow::compute::ExecContext>();
-    auto status = [&]() -> arrow::Status {
+    auto plan_status = [&]() -> arrow::Status {
       ARROW_ASSIGN_OR_RAISE(exec_plan_, arrow::compute::ExecPlan::Make(exec_context_.get()));
       auto schema = source_record_batch_reader->schema();
       ARROW_ASSIGN_OR_RAISE(auto batch_gen, arrow::compute::MakeReaderGenerator(std::move(source_record_batch_reader), arrow::internal::GetCpuThreadPool()));
