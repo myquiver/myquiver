@@ -8,6 +8,16 @@
 #include <arrow/io/api.h>
 #include <arrow/record_batch.h>
 #include <arrow/array.h>
+#include <arrow/compute/api.h>
+#include <arrow/compute/api_vector.h>
+#include <arrow/compute/cast.h>
+#include <arrow/compute/exec/exec_plan.h>
+#include <arrow/dataset/dataset.h>
+#include <arrow/dataset/file_base.h>
+#include <arrow/dataset/file_parquet.h>
+#include <arrow/dataset/plan.h>
+#include <arrow/dataset/scanner.h>
+#include <arrow/util/thread_pool.h>
 
 namespace mqv {
   class DebugColumnAccess {
@@ -37,13 +47,33 @@ class ha_my_quiver : public handler {
   
   int rnd_init(bool scan) override {
     DBUG_TRACE;
+
     auto num_row_groups = reader_->num_row_groups();
     std::vector<int> row_group_indices(num_row_groups);
     std::iota(row_group_indices.begin(), row_group_indices.end(), 0);
-    auto status = reader_->GetRecordBatchReader(row_group_indices, &record_batch_reader_);
+    std::unique_ptr<arrow::RecordBatchReader> source_record_batch_reader;
+    auto status = reader_->GetRecordBatchReader(row_group_indices, &source_record_batch_reader);
     if (!status.ok()) {
       return 1; // TODO: return error code
     }
+
+    exec_context_ = std::make_unique<arrow::compute::ExecContext>();
+    auto status = [&]() -> arrow::Status {
+      ARROW_ASSIGN_OR_RAISE(exec_plan_, arrow::compute::ExecPlan::Make(exec_context_.get()));
+      auto schema = source_record_batch_reader->schema();
+      ARROW_ASSIGN_OR_RAISE(auto batch_gen, arrow::compute::MakeReaderGenerator(std::move(source_record_batch_reader), arrow::internal::GetCpuThreadPool()));
+      auto source_node_options = arrow::compute::SourceNodeOptions{schema, batch_gen};
+      ARROW_ASSIGN_OR_RAISE(auto source,
+                        arrow::compute::MakeExecNode("source", exec_plan_.get(), {}, source_node_options));
+      
+      arrow::AsyncGenerator<std::optional<arrow::compute::ExecBatch>> sink_gen;
+      ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {source}, arrow::compute::SinkNodeOptions{&sink_gen}));
+
+      record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_.memory_pool());
+      
+      return arrow::Status::OK();
+    };
+
     auto record_batch_result = record_batch_reader_->Next();
     if (!record_batch_result.ok()) {
       return 2; // TODO: return error code
@@ -130,7 +160,9 @@ class ha_my_quiver : public handler {
 
   private:
     std::unique_ptr<parquet::arrow::FileReader> reader_;
-    std::unique_ptr<arrow::RecordBatchReader> record_batch_reader_;
+    std::shared_ptr<arrow::RecordBatchReader> record_batch_reader_;
     std::shared_ptr<arrow::RecordBatch> record_batch_;
+    std::unique_ptr<arrow::compute::ExecContext> exec_context_;
+    std::shared_ptr<arrow::compute::ExecPlan> exec_plan_;
     int64_t nth_row_;
 };
