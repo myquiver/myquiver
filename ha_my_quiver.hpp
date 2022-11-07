@@ -69,7 +69,7 @@ class ha_my_quiver : public handler {
       arrow::AsyncGenerator<std::optional<arrow::compute::ExecBatch>> sink_gen;
       ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {source}, arrow::compute::SinkNodeOptions{&sink_gen}));
 
-      record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_.memory_pool());
+      record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_->memory_pool());
       
       return arrow::Status::OK();
     };
