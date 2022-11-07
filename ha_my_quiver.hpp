@@ -71,6 +71,7 @@ class ha_my_quiver : public handler {
       ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {source}, arrow::compute::SinkNodeOptions{&sink_gen}));
 
       record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_->memory_pool());
+      ARROW_RETURN_NOT_OK(exec_plan_->StartProducing());
       
       return arrow::Status::OK();
     };
@@ -86,6 +87,12 @@ class ha_my_quiver : public handler {
   int rnd_end() override {
     DBUG_TRACE;
     record_batch_reader_ = nullptr;
+    exec_plan_->StopProducing();
+    auto future = exec_plan_->finished();
+    auto status = future.status();
+    if (!status.ok()) {
+      return 3; // TODO: return error code
+    }
     return 0;
   }
   int rnd_next(uchar *buf) override {
