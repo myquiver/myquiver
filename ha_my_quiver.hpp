@@ -4,6 +4,9 @@
 #include <sql/table.h>
 #include <sql/field.h>
 #include <mysql/plugin.h>
+
+#undef base_name
+
 #include <parquet/arrow/reader.h>
 #include <arrow/io/api.h>
 #include <arrow/record_batch.h>
