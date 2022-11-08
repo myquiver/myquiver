@@ -77,7 +77,11 @@ class ha_my_quiver : public handler {
       ARROW_RETURN_NOT_OK(exec_plan_->StartProducing());
       
       return arrow::Status::OK();
-    };
+    }();
+
+    if (!plan_status.ok()) {
+      return 4; // TODO: return error code
+    }
 
     auto record_batch_result = record_batch_reader_->Next();
     if (!record_batch_result.ok()) {
