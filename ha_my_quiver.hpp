@@ -51,28 +51,20 @@ class ha_my_quiver : public handler {
   int rnd_init(bool scan) override {
     DBUG_TRACE;
 
-    auto num_row_groups = reader_->num_row_groups();
-    std::vector<int> row_group_indices(num_row_groups);
-    std::iota(row_group_indices.begin(), row_group_indices.end(), 0);
-    std::unique_ptr<arrow::RecordBatchReader> source_record_batch_reader;
-    auto reader_status = reader_->GetRecordBatchReader(row_group_indices, &source_record_batch_reader);
-    if (!reader_status.ok()) {
-      return 1; // TODO: return error code
-    }
-
     exec_context_ = std::make_unique<arrow::compute::ExecContext>();
     auto plan_status = [&]() -> arrow::Status {
       ARROW_ASSIGN_OR_RAISE(exec_plan_, arrow::compute::ExecPlan::Make(exec_context_.get()));
-      auto schema = source_record_batch_reader->schema();
-      ARROW_ASSIGN_OR_RAISE(auto batch_gen, arrow::compute::MakeReaderGenerator(std::move(source_record_batch_reader), arrow::internal::GetCpuThreadPool()));
-      auto source_node_options = arrow::compute::SourceNodeOptions{schema, batch_gen};
-      ARROW_ASSIGN_OR_RAISE(auto source,
-                        arrow::compute::MakeExecNode("source", exec_plan_.get(), {}, source_node_options));
+
+      ARROW_ASSIGN_OR_RAISE(auto dataset, dateset_factory_->Finish());
+      auto schema = dataset->schema();
+      auto scan_options = std::make_shared<arrow::dataset::ScanOptions>();
+      scan_options->projection = arrow::compute::project({}, {});  // create empty projection
+      auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, scan_options};
+      ARROW_ASSIGN_OR_RAISE(auto scan, arrow::compute::MakeExecNode("scan", exec_plan_.get(), {}, scan_node_options));
 
       // TODO: Change to std:optional after updating arrow
       arrow::AsyncGenerator<arrow::util::optional<arrow::compute::ExecBatch>> sink_gen;
-      ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {source}, arrow::compute::SinkNodeOptions{&sink_gen}));
-
+      ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {scan}, arrow::compute::SinkNodeOptions{&sink_gen}));
       record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_->memory_pool());
       ARROW_RETURN_NOT_OK(exec_plan_->StartProducing());
       
@@ -140,13 +132,19 @@ class ha_my_quiver : public handler {
   int open(const char *name, int, uint, const dd::Table *) override {
     DBUG_TRACE;
 
-    auto input_result = arrow::io::ReadableFile::Open(std::string(name)+".parquet");
-    if (!input_result.ok()) {
-      return 1; // TODO: return error code
-    }
-    auto status = parquet::arrow::OpenFile(*input_result, arrow::default_memory_pool(), &reader_);
+    auto status = [&]() -> arrow::Status {
+      // TODO: Fix base path to get multiple files from child directory.
+      ARROW_ASSIGN_OR_RAISE(auto fs, arrow::fs::FileSystemFromUriOrPath(std::string(name)+".parquet"));
+      arrow::fs::FileSelector selector;
+      arrow::dataset::FileSystemFactoryOptions options;
+      auto read_format = std::make_shared<arrow::dataset::ParquetFileFormat>();
+      ARROW_ASSIGN_OR_RAISE(dateset_factory_, arrow::dataset::FileSystemDatasetFactory::Make(fs, selector, read_format, options));
+
+      return arrow::Status::OK();
+    }();
+
     if (!status.ok()) {
-      return 2; // TODO: return error code
+      return 1; // TODO: return error code
     }
 
     return 0;
@@ -174,6 +172,7 @@ class ha_my_quiver : public handler {
   }
 
   private:
+    std::shared_ptr<arrow::dataset::DatasetFactory> dateset_factory_;
     std::unique_ptr<parquet::arrow::FileReader> reader_;
     std::shared_ptr<arrow::RecordBatchReader> record_batch_reader_;
     std::shared_ptr<arrow::RecordBatch> record_batch_;
