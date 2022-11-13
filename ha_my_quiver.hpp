@@ -133,10 +133,21 @@ class ha_my_quiver : public handler {
     DBUG_TRACE;
 
     auto status = [&]() -> arrow::Status {
-      // TODO: Fix base path to get multiple files from child directory.
-      ARROW_ASSIGN_OR_RAISE(auto fs, arrow::fs::FileSystemFromUriOrPath(std::string(name)+".parquet"));
+      // TODO: Move this initialize to more suitable position. 
+      arrow::dataset::internal::Initialize();
+
+      char setup_path[256];
+      char* result = getcwd(setup_path, 256);
+      if (result == NULL) {
+        return arrow::Status::IOError("Fetching PWD failed.");
+      }
+      // TODO: Fix file location to support both local file path and remote file path.
+      ARROW_ASSIGN_OR_RAISE(auto fs, arrow::fs::FileSystemFromUriOrPath(setup_path));
       arrow::fs::FileSelector selector;
+      selector.recursive = true;
+      selector.base_dir = "test";
       arrow::dataset::FileSystemFactoryOptions options;
+      options.exclude_invalid_files = true; // TODO: There is invalid parquet file in the test directories. 
       auto read_format = std::make_shared<arrow::dataset::ParquetFileFormat>();
       ARROW_ASSIGN_OR_RAISE(dateset_factory_, arrow::dataset::FileSystemDatasetFactory::Make(fs, selector, read_format, options));
 
@@ -159,21 +170,12 @@ class ha_my_quiver : public handler {
   int create(const char *name, TABLE *, HA_CREATE_INFO *,
                        dd::Table *) override {
     DBUG_TRACE;
-    auto input_result = arrow::io::ReadableFile::Open(std::string(name)+".parquet");
-    if (!input_result.ok()) {
-      return 1; // TODO: return error code
-    }
-    auto status = parquet::arrow::OpenFile(*input_result, arrow::default_memory_pool(), &reader_);
-    if (!status.ok()) {
-      return 2; // TODO: return error code
-    }
 
     return 0;
   }
 
   private:
     std::shared_ptr<arrow::dataset::DatasetFactory> dateset_factory_;
-    std::unique_ptr<parquet::arrow::FileReader> reader_;
     std::shared_ptr<arrow::RecordBatchReader> record_batch_reader_;
     std::shared_ptr<arrow::RecordBatch> record_batch_;
     std::unique_ptr<arrow::compute::ExecContext> exec_context_;
