@@ -22,6 +22,8 @@
 #include <arrow/dataset/scanner.h>
 #include <arrow/util/thread_pool.h>
 
+#include <filesystem>
+
 namespace mqv {
   class DebugColumnAccess {
     TABLE *table_;
@@ -133,23 +135,14 @@ class ha_my_quiver : public handler {
     DBUG_TRACE;
 
     auto status = [&]() -> arrow::Status {
-      // TODO: Move this initialize to more suitable position. 
-      arrow::dataset::internal::Initialize();
 
-      char setup_path[256];
-      char* result = getcwd(setup_path, 256);
-      if (result == NULL) {
-        return arrow::Status::IOError("Fetching PWD failed.");
-      }
-      // TODO: Fix file location to support both local file path and remote file path.
-      ARROW_ASSIGN_OR_RAISE(auto fs, arrow::fs::FileSystemFromUriOrPath(setup_path));
-      arrow::fs::FileSelector selector;
-      selector.recursive = true;
-      selector.base_dir = "test";
+      auto data_path = std::filesystem::current_path();
+      data_path /= std::string(name)+".parquet";
+      auto uri =  "file://" + data_path.string();
       arrow::dataset::FileSystemFactoryOptions options;
       options.exclude_invalid_files = true; // TODO: There is invalid parquet file in the test directories. 
       auto read_format = std::make_shared<arrow::dataset::ParquetFileFormat>();
-      ARROW_ASSIGN_OR_RAISE(dateset_factory_, arrow::dataset::FileSystemDatasetFactory::Make(fs, selector, read_format, options));
+      ARROW_ASSIGN_OR_RAISE(dateset_factory_, arrow::dataset::FileSystemDatasetFactory::Make(uri, read_format, options));
 
       return arrow::Status::OK();
     }();
