@@ -21,8 +21,9 @@ target_link_libraries(mysqld INTERFACE OpenSSL::SSL)
 
 find_package(Arrow REQUIRED)
 find_package(Parquet REQUIRED)
+find_package(ArrowDataset REQUIRED)
 
-target_link_libraries(ha_my_quiver PRIVATE mysqld parquet_shared)
+target_link_libraries(ha_my_quiver PRIVATE mysqld parquet_shared arrow_dataset_shared)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/config.sh.in"

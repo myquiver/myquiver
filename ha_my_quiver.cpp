@@ -1,7 +1,7 @@
 #include "ha_my_quiver.hpp"
 
 ha_my_quiver::ha_my_quiver(handlerton *hton, TABLE_SHARE *table_arg)
-    : handler(hton, table_arg), reader_(nullptr) {}
+    : handler(hton, table_arg) {} // TODO: Initialize instance val
 
 
 static struct st_mysql_storage_engine my_quiver_storage_engine = {
@@ -21,6 +21,8 @@ static int my_quiver_init_func(void *p) {
   hton->create = my_quiver_create_handler;
   hton->flags = 
     (HTON_ALTER_NOT_SUPPORTED | HTON_CAN_RECREATE | HTON_NO_PARTITION);
+
+  arrow::dataset::internal::Initialize();
 
   return 0;
 }
