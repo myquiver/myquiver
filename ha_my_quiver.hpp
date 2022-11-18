@@ -24,6 +24,10 @@
 
 #include <filesystem>
 
+#define ERR_MYQUIVER_FIRST 600
+#define ERR_MYQUIVER_ERROR_FROM_ARROW_NUM ERR_MYQUIVER_FIRST
+#define ERR_MYQUIVER_ERROR_FROM_ARROW_STR "Error from arrow [%s]"
+
 namespace mqv {
   class DebugColumnAccess {
     TABLE *table_;
@@ -44,6 +48,12 @@ namespace mqv {
     };
   };
 };
+
+static int arrow_status_error(arrow::Status status) {
+  auto message = status.message();
+  my_printf_error(ERR_MYQUIVER_ERROR_FROM_ARROW_NUM, ERR_MYQUIVER_ERROR_FROM_ARROW_STR, MYF(0), message.c_str());
+  return ERR_MYQUIVER_ERROR_FROM_ARROW_NUM;
+}
 
 class ha_my_quiver : public handler {
   public:
@@ -74,12 +84,13 @@ class ha_my_quiver : public handler {
     }();
 
     if (!plan_status.ok()) {
-      return 4; // TODO: return error code
+      return arrow_status_error(plan_status);
     }
 
     auto record_batch_result = record_batch_reader_->Next();
     if (!record_batch_result.ok()) {
-      return 2; // TODO: return error code
+      auto status = record_batch_result.status();
+      return arrow_status_error(status);
     }
     record_batch_ = *record_batch_result;
     nth_row_ = 0;
@@ -92,7 +103,7 @@ class ha_my_quiver : public handler {
     auto future = exec_plan_->finished();
     auto status = future.status();
     if (!status.ok()) {
-      return 3; // TODO: return error code
+      return arrow_status_error(status);
     }
     return 0;
   }
@@ -138,7 +149,7 @@ class ha_my_quiver : public handler {
 
       auto data_path = std::filesystem::current_path();
       data_path /= std::string(name)+".parquet";
-      auto uri =  "file://" + data_path.string();
+      auto uri = "file://" + data_path.string();
       arrow::dataset::FileSystemFactoryOptions options;
       options.exclude_invalid_files = true; // TODO: There is invalid parquet file in the test directories. 
       auto read_format = std::make_shared<arrow::dataset::ParquetFileFormat>();
@@ -148,7 +159,7 @@ class ha_my_quiver : public handler {
     }();
 
     if (!status.ok()) {
-      return 1; // TODO: return error code
+      return arrow_status_error(status);
     }
 
     return 0;
