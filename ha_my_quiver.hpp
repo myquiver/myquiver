@@ -70,16 +70,21 @@ class ha_my_quiver : public handler {
       ARROW_ASSIGN_OR_RAISE(auto dataset, dateset_factory_->Finish());
       auto schema = dataset->schema();
       auto scan_options = std::make_shared<arrow::dataset::ScanOptions>();
-      scan_options->projection = arrow::compute::project({}, {});  // create empty projection
-      auto scan_node_options = arrow::dataset::ScanNodeOptions{dataset, scan_options};
-      ARROW_ASSIGN_OR_RAISE(auto scan, arrow::compute::MakeExecNode("scan", exec_plan_.get(), {}, scan_node_options));
-
-      // TODO: Change to std:optional after updating arrow
+      // TODO: Change to std::optional after updating arrow
       arrow::AsyncGenerator<arrow::util::optional<arrow::compute::ExecBatch>> sink_gen;
-      ARROW_RETURN_NOT_OK(arrow::compute::MakeExecNode("sink", exec_plan_.get(), {scan}, arrow::compute::SinkNodeOptions{&sink_gen}));
+
+      ARROW_ASSIGN_OR_RAISE(
+        auto declaration, arrow::compute::Declaration::Sequence({
+          {"scan", arrow::dataset::ScanNodeOptions{dataset, scan_options}},
+          {"sink", arrow::compute::SinkNodeOptions{&sink_gen}},
+        }).AddToPlan(exec_plan_.get()));
+
+      ARROW_RETURN_NOT_OK(declaration->Validate());
+      ARROW_RETURN_NOT_OK(exec_plan_->Validate());
+
+      ARROW_RETURN_NOT_OK(exec_plan_->StartProducing());  
       record_batch_reader_ = arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen), exec_context_->memory_pool());
-      ARROW_RETURN_NOT_OK(exec_plan_->StartProducing());
-      
+
       return arrow::Status::OK();
     }();
 
