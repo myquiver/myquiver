@@ -11,7 +11,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         bison build-essential ccache cmake flex libncurses5-dev libssl-dev libz-dev libz-dev ninja-build pkg-config \
         python3 python3-pip
 
-ENV ARROW_VERSION 9.0.0-1
+ENV ARROW_VERSION 10.0.0-1
 RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
     && apt-get install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
     && apt-get update && apt-get install -y -V \
