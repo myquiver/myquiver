@@ -70,8 +70,7 @@ class ha_my_quiver : public handler {
       ARROW_ASSIGN_OR_RAISE(auto dataset, dateset_factory_->Finish());
       auto schema = dataset->schema();
       auto scan_options = std::make_shared<arrow::dataset::ScanOptions>();
-      // TODO: Change to std::optional after updating arrow
-      arrow::AsyncGenerator<arrow::util::optional<arrow::compute::ExecBatch>> sink_gen;
+      arrow::AsyncGenerator<std::optional<arrow::compute::ExecBatch>> sink_gen;
 
       ARROW_ASSIGN_OR_RAISE(
         auto declaration, arrow::compute::Declaration::Sequence({
