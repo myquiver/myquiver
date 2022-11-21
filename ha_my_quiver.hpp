@@ -113,6 +113,9 @@ class ha_my_quiver : public handler {
   }
   int rnd_next(uchar *buf) override {
     DBUG_TRACE;
+    if (!record_batch_) {
+      return HA_ERR_END_OF_FILE;
+    }
     auto column = std::static_pointer_cast<arrow::Int64Array>(record_batch_->columns()[0]);
     auto value = column->Value(nth_row_);
     auto field = static_cast<Field_longlong*>(table->field[0]);
@@ -121,11 +124,16 @@ class ha_my_quiver : public handler {
       field->set_notnull();
       field->store(value, false);
     }
-    if (nth_row_ >= record_batch_->num_rows()) {
-      //TODO: record_batch_readerをNextする
-      return HA_ERR_END_OF_FILE;
-    }
     nth_row_++;
+    if (nth_row_ >= record_batch_->num_rows()) {
+      auto record_batch_result = record_batch_reader_->Next();
+      if (!record_batch_result.ok()) {
+        auto status = record_batch_result.status();
+        return arrow_status_error(status);
+      }
+      record_batch_ = *record_batch_result;
+      nth_row_ = 0;
+    }
     return 0;
   }
   int rnd_pos(uchar *buf, uchar *pos) override {
