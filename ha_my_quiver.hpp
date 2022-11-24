@@ -27,8 +27,6 @@
 #define ERR_MYQUIVER_FIRST 600
 #define ERR_MYQUIVER_ERROR_FROM_ARROW_NUM ERR_MYQUIVER_FIRST
 #define ERR_MYQUIVER_ERROR_FROM_ARROW_STR "Error from arrow [%s]"
-#define ERR_MYQUIVER_ERROR_COLUMN_NOT_FOUND_NUM ( ERR_MYQUIVER_FIRST + 1 )
-#define ERR_MYQUIVER_ERROR_COLUMN_NOT_FOUND_STR "Column [%s] is not in the file"
 
 namespace mqv {
   class DebugColumnAccess {
