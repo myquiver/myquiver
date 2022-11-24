@@ -1,0 +1,25 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_all;
+--enable_warnings
+--copy_file  suite/my-quiver/select_all.parquet $MYSQLD_DATADIR/test/select_all.parquet
+
+CREATE TABLE select_all (
+  c1 int,
+  c2 int,
+  c3 int,
+  n1 int
+);
+
+SELECT * FROM select_all;
+SELECT c1, c2, c3, n1 FROM select_all;
+SELECT c1 FROM select_all;
+SELECT c2 FROM select_all;
+SELECT c3 FROM select_all;
+SELECT n1 FROM select_all;
+
+DROP TABLE select_all;
+--remove_file $MYSQLD_DATADIR/test/select_all.parquet
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

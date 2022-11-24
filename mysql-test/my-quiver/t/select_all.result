@@ -1,0 +1,38 @@
+DROP TABLE IF EXISTS select_all;
+CREATE TABLE select_all (
+c1 int,
+c2 int,
+c3 int,
+n1 int
+);
+SELECT * FROM select_all;
+c1	c2	c3	n1
+1	10	100	NULL
+2	20	200	NULL
+3	30	300	NULL
+SELECT c1, c2, c3, n1 FROM select_all;
+c1	c2	c3	n1
+1	10	100	NULL
+2	20	200	NULL
+3	30	300	NULL
+SELECT c1 FROM select_all;
+c1
+1
+2
+3
+SELECT c2 FROM select_all;
+c2
+10
+20
+30
+SELECT c3 FROM select_all;
+c3
+100
+200
+300
+SELECT n1 FROM select_all;
+n1
+NULL
+NULL
+NULL
+DROP TABLE select_all;
