@@ -1,2 +1,2 @@
 build
-*.parquet
+/mysql-test/suite/*.parquet

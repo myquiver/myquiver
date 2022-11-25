@@ -3,7 +3,7 @@
 --disable_warnings
 DROP TABLE IF EXISTS count_star;
 --enable_warnings
---copy_file  suite/my-quiver/count_star.parquet $MYSQLD_DATADIR/test/count_star.parquet
+--copy_file suite/my-quiver/count_star.parquet $MYSQLD_DATADIR/test/count_star.parquet
 
 CREATE TABLE count_star (
   id int
