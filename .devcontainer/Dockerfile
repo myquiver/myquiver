@@ -18,6 +18,8 @@ RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | 
         libarrow-dev=${ARROW_VERSION} libarrow-dataset-dev=${ARROW_VERSION} libparquet-dev=${ARROW_VERSION} \
     && rm -f ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
 
+RUN pyhon3 -m pip install pandas pyarrow
+
 # https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \

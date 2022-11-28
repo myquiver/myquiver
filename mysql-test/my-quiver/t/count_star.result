@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS count_star;
+CREATE TABLE count_star (
+id int
+);
+SELECT COUNT(*) FROM count_star;
+COUNT(*)
+3
+DROP TABLE count_star;

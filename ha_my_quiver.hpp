@@ -116,14 +116,24 @@ class ha_my_quiver : public handler {
     if (!record_batch_) {
       return HA_ERR_END_OF_FILE;
     }
-    auto column = std::static_pointer_cast<arrow::Int64Array>(record_batch_->columns()[0]);
-    auto value = column->Value(nth_row_);
-    auto field = static_cast<Field_longlong*>(table->field[0]);
-    {
-      mqv::DebugColumnAccess debug_column_access(table, table->write_set);
-      field->set_notnull();
-      field->store(value, false);
+
+    auto n_columns = table->s->fields;
+    for (auto i = 0; i < n_columns; i++) {
+      auto field = static_cast<Field_longlong*>(table->field[i]);
+      auto name = field->field_name;
+      auto column = std::static_pointer_cast<arrow::Int64Array>(record_batch_->GetColumnByName(name));
+      if (!column) {
+        // TODO: Need to handle column that has NOT NULL attribute
+        continue;
+      }
+      auto value = column->Value(nth_row_);
+      {
+        mqv::DebugColumnAccess debug_column_access(table, table->write_set);
+        field->set_notnull();
+        field->store(value, false);
+      }
     }
+
     nth_row_++;
     if (nth_row_ >= record_batch_->num_rows()) {
       auto record_batch_result = record_batch_reader_->Next();

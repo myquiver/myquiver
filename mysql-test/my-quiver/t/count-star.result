@@ -1,8 +1,0 @@
-DROP TABLE IF EXISTS example;
-CREATE TABLE example (
-id int
-);
-SELECT COUNT(*) FROM example;
-COUNT(*)
-3
-DROP TABLE example;
