@@ -1,0 +1,43 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_types;
+--enable_warnings
+--copy_file suite/my-quiver/select_types.parquet $MYSQLD_DATADIR/test/select_types.parquet
+
+CREATE TABLE select_types (
+  int8_t tinyint,
+  uint8_t tinyint unsigned,
+  int16_t smallint,
+  uint16_t smallint unsigned,
+  int24_t mediumint,
+  uint24_t mediumint unsigned,
+  int32_t int,
+  uint32_t int unsigned,
+  int64_t bigint,
+  uint64_t bigint unsigned,
+  float_t float,
+  double_t double,
+  varchar_t varchar(7),
+  text_t text
+);
+
+SELECT int8_t FROM select_types;
+SELECT uint8_t FROM select_types;
+SELECT int16_t FROM select_types;
+SELECT uint16_t FROM select_types;
+SELECT int24_t FROM select_types;
+SELECT uint24_t FROM select_types;
+SELECT int32_t FROM select_types;
+SELECT uint32_t FROM select_types;
+SELECT int64_t FROM select_types;
+SELECT uint64_t FROM select_types;
+SELECT float_t FROM select_types;
+SELECT double_t FROM select_types;
+SELECT varchar_t FROM select_types;
+SELECT text_t FROM select_types;
+
+DROP TABLE select_types;
+--remove_file $MYSQLD_DATADIR/test/select_types.parquet
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

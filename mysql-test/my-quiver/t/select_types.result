@@ -1,0 +1,74 @@
+DROP TABLE IF EXISTS select_types;
+CREATE TABLE select_types (
+int8_t tinyint,
+uint8_t tinyint unsigned,
+int16_t smallint,
+uint16_t smallint unsigned,
+int24_t mediumint,
+uint24_t mediumint unsigned,
+int32_t int,
+uint32_t int unsigned,
+int64_t bigint,
+uint64_t bigint unsigned,
+float_t float,
+double_t double,
+varchar_t varchar(7),
+text_t text
+);
+SELECT int8_t FROM select_types;
+int8_t
+-128
+127
+SELECT uint8_t FROM select_types;
+uint8_t
+0
+255
+SELECT int16_t FROM select_types;
+int16_t
+-32768
+32767
+SELECT uint16_t FROM select_types;
+uint16_t
+0
+65535
+SELECT int24_t FROM select_types;
+int24_t
+-8388608
+8388607
+SELECT uint24_t FROM select_types;
+uint24_t
+0
+16777215
+SELECT int32_t FROM select_types;
+int32_t
+-2147483648
+2147483647
+SELECT uint32_t FROM select_types;
+uint32_t
+0
+4294967295
+SELECT int64_t FROM select_types;
+int64_t
+-9223372036854775808
+9223372036854775807
+SELECT uint64_t FROM select_types;
+uint64_t
+0
+18446744073709551615
+SELECT float_t FROM select_types;
+float_t
+1.17549e-38
+3.40282e38
+SELECT double_t FROM select_types;
+double_t
+2.225074e-308
+1.797693e308
+SELECT varchar_t FROM select_types;
+varchar_t
+
+varchar
+SELECT text_t FROM select_types;
+text_t
+
+text
+DROP TABLE select_types;
