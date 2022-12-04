@@ -1,2 +1,2 @@
 build
-/mysql-test/suite/*.parquet
+/mysql-test/my-quiver/*.parquet
