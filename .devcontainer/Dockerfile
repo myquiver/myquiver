@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:bullseye
 
 ARG USERNAME=codespace
 ARG USER_UID=1000
@@ -25,16 +25,13 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
     && apt-get update && apt-get -y install gh
 
-RUN ln -s /usr/bin/ccache /usr/local/bin/gcc \
-    && ln -s /usr/bin/ccache /usr/local/bin/g++ \
-    && ln -s /usr/bin/ccache /usr/local/bin/cc \
-    && ln -s /usr/bin/ccache /usr/local/bin/c++
-
 RUN groupadd --gid ${USER_GID} ${USERNAME} && \
     useradd -s /bin/bash --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \
     echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} && \
     chmod 0440 /etc/sudoers.d/${USERNAME}
 
+ENV CMAKE_C_COMPILER_LAUNCHER ccache
+ENV CMAKE_CXX_COMPILER_LAUNCHER ccache
 ENV CCACHE_DIR /workspaces/.ccache
 ENV PAGER most
 
