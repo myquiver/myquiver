@@ -25,8 +25,8 @@
 #include <filesystem>
 
 #define ERR_MYQUIVER_FIRST 600
-#define ERR_MYQUIVER_ERROR_FROM_ARROW_NUM ERR_MYQUIVER_FIRST
-#define ERR_MYQUIVER_ERROR_FROM_ARROW_STR "Error from arrow [%s]"
+#define ERR_MYQUIVER_FROM_ARROW_NUM ERR_MYQUIVER_FIRST
+#define ERR_MYQUIVER_FROM_ARROW_STR "Error from arrow [%s]"
 
 namespace mqv {
   class DebugColumnAccess {
@@ -51,8 +51,8 @@ namespace mqv {
 
 static int arrow_status_error(arrow::Status status) {
   auto message = status.message();
-  my_printf_error(ERR_MYQUIVER_ERROR_FROM_ARROW_NUM, ERR_MYQUIVER_ERROR_FROM_ARROW_STR, MYF(0), message.c_str());
-  return ERR_MYQUIVER_ERROR_FROM_ARROW_NUM;
+  my_printf_error(ERR_MYQUIVER_FROM_ARROW_NUM, ERR_MYQUIVER_FROM_ARROW_STR, MYF(0), message.c_str());
+  return ERR_MYQUIVER_FROM_ARROW_NUM;
 }
 
 class ha_my_quiver : public handler {

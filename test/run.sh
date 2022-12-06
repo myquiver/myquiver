@@ -2,6 +2,8 @@
 
 set -eux
 
+python3 "$(dirname $0)/generate_test_data.py"
+
 : ${top_build_dir:="$(cd .; pwd)"}
 
 source_dir="$(cd $(dirname $0); pwd)"
