@@ -111,6 +111,64 @@ class ha_my_quiver : public handler {
     }
     return 0;
   }
+
+  void store_field_integer(Field *field, std::shared_ptr<arrow::Array> array) {
+    auto casted_array = std::static_pointer_cast<arrow::Int64Array>(array);
+    auto value = casted_array->Value(nth_row_);
+    {
+      mqv::DebugColumnAccess debug_column_access(table, table->write_set);
+      field->store(value, field->is_unsigned());
+    }
+  }
+
+  void store_field_floating_point(Field *field, std::shared_ptr<arrow::Array> array) {
+    auto casted_array = std::static_pointer_cast<arrow::DoubleArray>(array);
+    auto value = casted_array->Value(nth_row_);
+    {
+      mqv::DebugColumnAccess debug_column_access(table, table->write_set);
+      field->store(value);
+    }
+  }
+
+  void store_field_string(Field *field, std::shared_ptr<arrow::Array> array) {
+    auto casted_array = std::static_pointer_cast<arrow::StringArray>(array);
+    auto value = casted_array->Value(nth_row_);
+    auto str = std::string(value).c_str();
+    {
+      mqv::DebugColumnAccess debug_column_access(table, table->write_set);
+      //TODO: Need to care if charset is not utf8mb4
+      field->store(str, value.length(), field->charset());
+    }
+  }
+
+  void store_field(Field *field, std::shared_ptr<arrow::Array> array) {
+    // TODO: Need to handle overflow and to cause error when unsupported type is passed.
+    if (!array) {
+      return;
+    }
+    field->set_notnull();
+    switch (field->real_type()) {
+    case MYSQL_TYPE_TINY:
+    case MYSQL_TYPE_SHORT:
+    case MYSQL_TYPE_LONG:
+    case MYSQL_TYPE_INT24:
+    case MYSQL_TYPE_LONGLONG:
+      store_field_integer(field, array);
+      break;
+    case MYSQL_TYPE_FLOAT:
+    case MYSQL_TYPE_DOUBLE:
+      store_field_floating_point(field, array);
+      break;
+    case MYSQL_TYPE_VARCHAR:
+    case MYSQL_TYPE_STRING:
+    case MYSQL_TYPE_VAR_STRING:
+    case MYSQL_TYPE_BLOB:
+      // TODO: Need to support blob type
+      store_field_string(field, array);
+      break;
+    }
+  }
+
   int rnd_next(uchar *buf) override {
     DBUG_TRACE;
     if (!record_batch_) {
@@ -119,19 +177,10 @@ class ha_my_quiver : public handler {
 
     auto n_columns = table->s->fields;
     for (auto i = 0; i < n_columns; i++) {
-      auto field = static_cast<Field_longlong*>(table->field[i]);
+      auto field = table->field[i];
       auto name = field->field_name;
-      auto column = std::static_pointer_cast<arrow::Int64Array>(record_batch_->GetColumnByName(name));
-      if (!column) {
-        // TODO: Need to handle column that has NOT NULL attribute
-        continue;
-      }
-      auto value = column->Value(nth_row_);
-      {
-        mqv::DebugColumnAccess debug_column_access(table, table->write_set);
-        field->set_notnull();
-        field->store(value, false);
-      }
+      auto column = record_batch_->GetColumnByName(name);
+      store_field(field, column);
     }
 
     nth_row_++;
