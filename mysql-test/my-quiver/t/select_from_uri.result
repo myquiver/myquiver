@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS select_from_uri;
 CREATE TABLE select_from_uri (
 id int
-) comment='file:///tmp/select_from_uri';
+) comment='file:///mysql_datedir/select_from_uri';
 SELECT COUNT(*) FROM select_from_uri;
 COUNT(*)
 3

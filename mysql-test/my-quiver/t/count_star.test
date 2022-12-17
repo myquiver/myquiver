@@ -13,7 +13,6 @@ CREATE TABLE count_star (
 SELECT COUNT(*) FROM count_star;
 
 DROP TABLE count_star;
---remove_file $MYSQLD_DATADIR/test/count_star/count_star.parquet
---rmdir  $MYSQLD_DATADIR/test/count_star
+--force-rmdir $MYSQLD_DATADIR/test/count_star
 
 --source ../include/my-quiver/have-my-quiver-deinit.inc

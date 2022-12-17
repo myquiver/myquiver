@@ -21,7 +21,6 @@ SELECT c3 FROM select_all;
 SELECT n1 FROM select_all;
 
 DROP TABLE select_all;
---remove_file $MYSQLD_DATADIR/test/select_all/select_all.parquet
---rmdir $MYSQLD_DATADIR/test/select_all
+--force-rmdir $MYSQLD_DATADIR/test/select_all
 
 --source ../include/my-quiver/have-my-quiver-deinit.inc

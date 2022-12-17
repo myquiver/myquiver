@@ -39,7 +39,6 @@ SELECT varchar_t FROM select_types;
 SELECT text_t FROM select_types;
 
 DROP TABLE select_types;
---remove_file $MYSQLD_DATADIR/test/select_types/select_types.parquet
---rmdir $MYSQLD_DATADIR/test/select_types
+--force-rmdir $MYSQLD_DATADIR/test/select_types
 
 --source ../include/my-quiver/have-my-quiver-deinit.inc
