@@ -3,7 +3,8 @@
 --disable_warnings
 DROP TABLE IF EXISTS select_types;
 --enable_warnings
---copy_file suite/my-quiver/select_types.parquet $MYSQLD_DATADIR/test/select_types.parquet
+--mkdir $MYSQLD_DATADIR/test/select_types
+--copy_file suite/my-quiver/select_types.parquet $MYSQLD_DATADIR/test/select_types/select_types.parquet
 
 CREATE TABLE select_types (
   int8_t tinyint,
@@ -38,6 +39,6 @@ SELECT varchar_t FROM select_types;
 SELECT text_t FROM select_types;
 
 DROP TABLE select_types;
---remove_file $MYSQLD_DATADIR/test/select_types.parquet
+--force-rmdir $MYSQLD_DATADIR/test/select_types
 
 --source ../include/my-quiver/have-my-quiver-deinit.inc

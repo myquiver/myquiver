@@ -217,10 +217,15 @@ class ha_my_quiver : public handler {
     DBUG_TRACE;
 
     auto status = [&]() -> arrow::Status {
-
-      auto data_path = std::filesystem::current_path();
-      data_path /= std::string(name)+".parquet";
-      auto uri = "file://" + data_path.string();
+      std::string uri;
+      auto uri_from_comment = table_share->comment.str;
+      if (uri_from_comment) {
+        uri = std::string(uri_from_comment);
+      } else {
+        auto data_path = std::filesystem::current_path();
+        data_path /= std::string(name);
+        uri = "file://" + data_path.string();
+      }
       arrow::dataset::FileSystemFactoryOptions options;
       options.exclude_invalid_files = true; // TODO: There is invalid parquet file in the test directories. 
       auto read_format = std::make_shared<arrow::dataset::ParquetFileFormat>();

@@ -1,0 +1,19 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_from_uri;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/select_from_uri
+--copy_file suite/my-quiver/count_star.parquet $MYSQLD_DATADIR/select_from_uri/count_star.parquet
+
+--replace_result $MYSQLD_DATADIR /mysql_datedir
+eval CREATE TABLE select_from_uri (
+  id int
+) comment='file://$MYSQLD_DATADIR/select_from_uri';
+
+SELECT COUNT(*) FROM select_from_uri;
+
+DROP TABLE select_from_uri;
+--force-rmdir $MYSQLD_DATADIR/select_from_uri
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc
