@@ -45,8 +45,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 ENV ARROW_VERSION 10.0.1-1
 RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
     && apt-get install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-    && apt-get update && apt-get install -y -V \
-        libarrow-dev=${ARROW_VERSION} libarrow-dataset-dev=${ARROW_VERSION} libparquet-dev=${ARROW_VERSION} \
+    && apt-get update && apt-get install -y -V libarrow-dataset1000 \
     && rm -f ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
 
 COPY --from=builder /root/myquiver.build/ha_my_quiver.so /usr/lib/mysql/plugin/
