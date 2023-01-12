@@ -1,0 +1,7 @@
+.devcontainer
+.dockerignore
+.git
+.gitignore
+mysql-test
+test
+Dockerfile
