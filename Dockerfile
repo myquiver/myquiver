@@ -34,7 +34,7 @@ RUN mkdir -p myquiver.build \
         -DCMAKE_BUILD_TYPE=release \
         -DParquet_DIR=/usr/lib/x86_64-linux-gnu/cmake/arrow \
         -DArrowDataset_DIR=/usr/lib/x86_64-linux-gnu/cmake/arrow \
-        -GNinja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+        -GNinja \
     && ninja -C myquiver.build
 
 FROM mysql:8.0.31-debian
