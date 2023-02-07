@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_int16;
+CREATE TABLE select_int16 (
+int16_t smallint
+);
+SELECT int16_t FROM select_int16;
+int16_t
+-32768
+32767
+DROP TABLE select_int16;

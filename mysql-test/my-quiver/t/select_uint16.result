@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_uint16;
+CREATE TABLE select_uint16 (
+uint16_t smallint unsigned
+);
+SELECT uint16_t FROM select_uint16;
+uint16_t
+0
+65535
+DROP TABLE select_uint16;

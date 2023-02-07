@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_int64;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_int64
+--copy_file suite/my-quiver/select_int64.parquet $MYSQLD_DATADIR/test/select_int64/select_int64.parquet
+
+CREATE TABLE select_int64 (
+  int64_t bigint
+);
+
+SELECT int64_t FROM select_int64;
+
+DROP TABLE select_int64;
+--force-rmdir $MYSQLD_DATADIR/test/select_int64
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

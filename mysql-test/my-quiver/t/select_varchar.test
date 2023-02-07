@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_varchar;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_varchar
+--copy_file suite/my-quiver/select_varchar.parquet $MYSQLD_DATADIR/test/select_varchar/select_varchar.parquet
+
+CREATE TABLE select_varchar (
+  varchar_t varchar(7)
+);
+
+SELECT varchar_t FROM select_varchar;
+
+DROP TABLE select_varchar;
+--force-rmdir $MYSQLD_DATADIR/test/select_varchar
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

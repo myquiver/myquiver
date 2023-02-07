@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_varchar;
+CREATE TABLE select_varchar (
+varchar_t varchar(7)
+);
+SELECT varchar_t FROM select_varchar;
+varchar_t
+
+varchar
+DROP TABLE select_varchar;

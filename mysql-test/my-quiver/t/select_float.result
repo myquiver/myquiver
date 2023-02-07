@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_float;
+CREATE TABLE select_float (
+float_t float
+);
+SELECT float_t FROM select_float;
+float_t
+1.17549e-38
+3.40282e38
+DROP TABLE select_float;

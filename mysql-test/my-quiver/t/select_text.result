@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_text;
+CREATE TABLE select_text (
+text_t text
+);
+SELECT text_t FROM select_text;
+text_t
+
+text
+DROP TABLE select_text;

@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_float;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_float
+--copy_file suite/my-quiver/select_float.parquet $MYSQLD_DATADIR/test/select_float/select_float.parquet
+
+CREATE TABLE select_float (
+  float_t float
+);
+
+SELECT float_t FROM select_float;
+
+DROP TABLE select_float;
+--force-rmdir $MYSQLD_DATADIR/test/select_float
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_uint24;
+CREATE TABLE select_uint24 (
+uint24_t mediumint unsigned
+);
+SELECT uint24_t FROM select_uint24;
+uint24_t
+0
+16777215
+DROP TABLE select_uint24;

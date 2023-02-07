@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_text;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_text
+--copy_file suite/my-quiver/select_text.parquet $MYSQLD_DATADIR/test/select_text/select_text.parquet
+
+CREATE TABLE select_text (
+  text_t text
+);
+
+SELECT text_t FROM select_text;
+
+DROP TABLE select_text;
+--force-rmdir $MYSQLD_DATADIR/test/select_text
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc
