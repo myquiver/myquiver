@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_int8;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_int8
+--copy_file suite/my-quiver/select_int8.parquet $MYSQLD_DATADIR/test/select_int8/select_int8.parquet
+
+CREATE TABLE select_int8 (
+  int8_t tinyint
+);
+
+SELECT int8_t FROM select_int8;
+
+DROP TABLE select_int8;
+--force-rmdir $MYSQLD_DATADIR/test/select_int8
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

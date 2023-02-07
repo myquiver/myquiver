@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_uint24;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_uint24
+--copy_file suite/my-quiver/select_uint24.parquet $MYSQLD_DATADIR/test/select_uint24/select_uint24.parquet
+
+CREATE TABLE select_uint24 (
+  uint24_t mediumint unsigned
+);
+
+SELECT uint24_t FROM select_uint24;
+
+DROP TABLE select_uint24;
+--force-rmdir $MYSQLD_DATADIR/test/select_uint24
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

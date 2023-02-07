@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_int64;
+CREATE TABLE select_int64 (
+int64_t bigint
+);
+SELECT int64_t FROM select_int64;
+int64_t
+-9223372036854775808
+9223372036854775807
+DROP TABLE select_int64;

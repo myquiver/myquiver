@@ -1,0 +1,18 @@
+--source ../include/my-quiver/have-my-quiver.inc
+--source ../include/my-quiver/have-my-quiver-helper.inc
+--disable_warnings
+DROP TABLE IF EXISTS select_double;
+--enable_warnings
+--mkdir $MYSQLD_DATADIR/test/select_double
+--copy_file suite/my-quiver/select_double.parquet $MYSQLD_DATADIR/test/select_double/select_double.parquet
+
+CREATE TABLE select_double (
+  double_t double
+);
+
+SELECT double_t FROM select_double;
+
+DROP TABLE select_double;
+--force-rmdir $MYSQLD_DATADIR/test/select_double
+
+--source ../include/my-quiver/have-my-quiver-deinit.inc

@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_int24;
+CREATE TABLE select_int24 (
+int24_t mediumint
+);
+SELECT int24_t FROM select_int24;
+int24_t
+-8388608
+8388607
+DROP TABLE select_int24;

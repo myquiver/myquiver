@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_uint64;
+CREATE TABLE select_uint64 (
+uint64_t bigint unsigned
+);
+SELECT uint64_t FROM select_uint64;
+uint64_t
+0
+18446744073709551615
+DROP TABLE select_uint64;

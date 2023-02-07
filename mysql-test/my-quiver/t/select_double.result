@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_double;
+CREATE TABLE select_double (
+double_t double
+);
+SELECT double_t FROM select_double;
+double_t
+2.225074e-308
+1.797693e308
+DROP TABLE select_double;

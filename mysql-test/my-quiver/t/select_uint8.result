@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS select_uint8;
+CREATE TABLE select_uint8 (
+uint8_t tinyint unsigned
+);
+SELECT uint8_t FROM select_uint8;
+uint8_t
+0
+255
+DROP TABLE select_uint8;
